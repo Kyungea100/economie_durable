@@ -2,11 +2,11 @@ pragma solidity ^0.8.0 <0.8.19;
 
 contract Voting {
     address private admin;
-    mapping(address => Voter) private voters;
+    mapping(address => Voter) public voters;
     uint private voterCount;
     WorkflowStatus public status;
     //Il y a possibilité d'avoir un ou plusieurs gagnants selon l'instance
-    uint public numberOfWinningProposals = 1;
+    uint public numberOfWinningProposals;
     uint[] public winningProposalIds;
     Proposal[] private proposals;
 
@@ -55,6 +55,19 @@ contract Voting {
         _;
     }
 
+    function registerVoter(address _voterAddress) public{
+        if(!voters[_voterAddress].isRegistered){
+            Voter memory newVoter = Voter({
+                isRegistered: true,
+                hasVoted: false,
+                votedProposalId: 0
+            });
+            voters[_voterAddress] = newVoter;
+            voterCount+=1;
+            emit VoterRegistered(_voterAddress);
+        }
+    }
+
     function getVoterCount() public view returns (uint) {
         return voterCount;
     }
@@ -86,13 +99,6 @@ contract Voting {
         return admin;
     }
 
-    function registerVoter(address _voterAddress) public checkAdmin checkStage(WorkflowStatus.RegisteringVoters) {
-        voters[_voterAddress] = Voter(true, false, 0);
-        voterCount++;
-
-
-        emit VoterRegistered(_voterAddress);
-    }
 
     function startProposalsRegistration() public checkAdmin checkStage(WorkflowStatus.RegisteringVoters) {
         status = WorkflowStatus.ProposalsRegistrationStarted;
