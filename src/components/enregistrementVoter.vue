@@ -4,15 +4,11 @@
     <div>
       <label for="voterInput">Adresse du nouvel électeur :</label>
       <input type="text" id="voterInput" v-model="newVoter" />
-      <button @click="registerVoter">Enregistrer Proposition</button>
+      <button @click="registerVoter">Enregistrer électeur</button>
     </div>
 
-    <h2>Liste des Propositions Enregistrées</h2>
+    <h2>Liste des électeurs enregistrés</h2>
     <ul>
-      voters =
-      {{
-        votersList
-      }}
       <li v-for="(voter, index) in votersList" :key="index">
         {{ voter }}
       </li>
@@ -31,7 +27,7 @@ export default {
     let votersList = ref([]);
     let contractInstance = new web3.eth.Contract(
       votingContract.abi,
-      "0xe8F47f5939cF3C66e730c9311c15DBD7f0273F31"
+      "0x99d1AA69dF4Cf58ac4b367f8F5fea08303C73931"
     );
     //remplacer l'adresse par celle qui s'affiche au déploiement du contrat
 
@@ -39,8 +35,8 @@ export default {
       const voterCount = contractInstance.methods.getVoterCount().call();
       console.log(voterCount);
       for (let i = 0; i < voterCount; i++) {
-        const voter = await contractInstance.methods.getVoters().call();
-        votersList.value.push(voter[i]);
+        const voterList = await contractInstance.methods.getVoters().call();
+        votersList.value.push(voterList[i]);
       }
       console.log(votersList.value);
     }
@@ -56,8 +52,6 @@ export default {
       contractInstance.methods.registerVoter(newVoter.value).send({ from: sender });
 
       await loadVoters();
-
-      newVoter = "";
     }
 
     return {

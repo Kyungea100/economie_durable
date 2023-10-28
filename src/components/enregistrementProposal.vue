@@ -9,7 +9,6 @@
 
         <h2>Liste des Propositions Enregistrées</h2>
         <ul>
-            proposals = {{proposalsList}}
             <li v-for="(proposal, index) in proposalsList" :key="index">
                 {{ proposal }}
             </li>
@@ -24,11 +23,11 @@ import votingContract from "/dapp/build/contracts/Voting.json";
 import { ref } from "vue";
 export default {
     setup() {
-        let newProposal = "";
+        let newProposal = ref("");
         let proposalsList = ref([]);
         let contractInstance = new web3.eth.Contract(
             votingContract.abi,
-            "0x949632A6dA2AD58967CEFD812c0e3ec5B6bAB6cB"
+            "0x99d1AA69dF4Cf58ac4b367f8F5fea08303C73931"
         );
         //remplacer l'adresse par celle qui s'affiche au déploiement du contrat
 
@@ -37,8 +36,8 @@ export default {
             console.log(proposalCount);
             for (let i = 0; i < proposalCount; i++) {
                 const proposal = await contractInstance.methods.getProposals().call();
+                console.log("proposals", proposal)
                 proposalsList.value.push(proposal[i]);
-                proposalsList.value.push({description: "quelque chose", voteCount: 0})
             }
             console.log(proposalsList.value);
         }
@@ -53,15 +52,12 @@ export default {
                 .startProposalsRegistration()
                 .send({ from: sender });
 
-            const proposalCount = contractInstance.methods.getProposalCount().call();
-            console.log("Count after registration", proposalCount);
+            console.log("proposal", newProposal);
             contractInstance.methods
-                .registerProposal(newProposal)
+                .registerProposal(newProposal.value)
                 .send({ from: sender });
 
             await loadProposals();
-
-            newProposal = "";
         }
 
         return {
