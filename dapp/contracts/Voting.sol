@@ -2,12 +2,12 @@ pragma solidity ^0.8.0 <0.8.19;
 
 contract Voting {
     address private admin;
-    mapping(address => Voter) public voters;
+    mapping(address => Voter) private voters;
     uint private voterCount;
-    WorkflowStatus public status;
+    WorkflowStatus private status;
     //Il y a possibilité d'avoir un ou plusieurs gagnants selon l'instance
-    uint public numberOfWinningProposals;
-    uint[] public winningProposalIds;
+    uint private numberOfWinningProposals;
+    uint[] private winningProposalIds;
     Proposal[] private proposals;
 
     struct Voter {
